@@ -51,7 +51,7 @@ export const Footer: React.FC = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {currentYear} GD Investimentos. Todos os direitos reservados.</p>
+        <p>&copy; {currentYear} AJ Tech. Todos os direitos reservados.</p>
       </div>
     </footer>
   );

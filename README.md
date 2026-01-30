@@ -154,4 +154,4 @@ GDInvestementos/
 
 This project is developed for educational and portfolio purposes.
 
-**Developed by GD Team**
+**Developed by AJ Tech**
