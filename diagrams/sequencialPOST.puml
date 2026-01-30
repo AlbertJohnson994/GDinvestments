@@ -1,0 +1,58 @@
+@startuml
+skinparam sequence {
+    ParticipantBackgroundColor #E0F2F1
+    ActorBackgroundColor #FFF3E0
+    LifeLineBackgroundColor #FFFFFF
+    ArrowColor #333333
+}
+
+actor Client as "Cliente\n(HTTP Client)"
+participant "InvestmentController" as Controller
+participant "InvestmentServiceImpl" as Service
+participant "InvestmentRepository" as Repository
+participant "ModelMapper" as Mapper
+database "PostgreSQL" as DB
+
+Client -> Controller: POST /investments\nContent-Type: application/json
+activate Client
+activate Controller
+
+Controller -> Controller: Valida @Valid InvestmentRequestDTO
+Controller -> Service: createInvestment(requestDTO)
+activate Service
+
+Service -> Mapper: mapToEntity(requestDTO)
+activate Mapper
+Mapper --> Service: Investment entity
+deactivate Mapper
+
+Service -> Service: setCurrentPrice()\n(via MarketDataService)
+
+Service -> Repository: save(investment)
+activate Repository
+
+Repository -> DB: INSERT INTO investment
+activate DB
+DB --> Repository: ID gerado
+deactivate DB
+
+Repository --> Service: Investment salvo
+deactivate Repository
+
+Service -> Service: calculateCurrentValue()
+Service -> Service: calculateProfitLoss()
+
+Service -> Mapper: mapToDTO(investment)
+activate Mapper
+Mapper --> Service: InvestmentResponseDTO
+deactivate Mapper
+
+Service --> Controller: InvestmentResponseDTO
+deactivate Service
+
+Controller -> Controller: ResponseEntity.created()\n.status(201)
+Controller --> Client: 201 Created\n+ InvestmentResponseDTO
+deactivate Controller
+deactivate Client
+
+@enduml

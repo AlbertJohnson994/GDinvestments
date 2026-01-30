@@ -1,0 +1,23 @@
+src/main/java/com/fintech/investments/
+├── controller/
+│   └── InvestmentController.java
+├── service/
+│   ├── InvestmentService.java (interface)
+│   ├── InvestmentServiceImpl.java
+│   └── MarketDataService.java (interface, opcional)
+├── repository/
+│   └── InvestmentRepository.java
+├── model/
+│   ├── entity/
+│   │   └── Investment.java
+│   ├── dto/
+│   │   ├── InvestmentRequestDTO.java
+│   │   ├── InvestmentResponseDTO.java
+│   │   └── SummaryDTO.java
+│   └── enum/
+│       └── AssetType.java
+├── exception/
+│   ├── InvestmentNotFoundException.java
+│   └── GlobalExceptionHandler.java
+└── config/
+    └── ModelMapperConfig.java

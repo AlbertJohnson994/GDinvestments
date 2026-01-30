@@ -1,0 +1,191 @@
+@startuml
+!define Color_Entity #FFE6CC
+!define Color_Enum #E1F5FE
+!define Color_Interface #F3E5F5
+!define Color_Controller #FFF3E0
+!define Color_DTO #E8F5E8
+!define Color_Service #E0F2F1
+
+skinparam class {
+    BackgroundColor<<Entity>> Color_Entity
+    BackgroundColor<<Enum>> Color_Enum
+    BackgroundColor<<Interface>> Color_Interface
+    BackgroundColor<<Controller>> Color_Controller
+    BackgroundColor<<DTO>> Color_DTO
+    BackgroundColor<<Service>> Color_Service
+    BorderColor #666666
+    ArrowColor #333333
+}
+
+package "com.fintech.investments" {
+    
+    ' === ENUMS ===
+    enum AssetType <<Enum>> {
+        STOCK
+        CRYPTO
+        FUND
+        FIXED_INCOME
+        OTHER
+    }
+    
+    ' === ENTIDADES ===
+    class Investment <<Entity>> {
+        - id: Long
+        - type: AssetType
+        - symbol: String
+        - name: String
+        - quantity: Double
+        - purchasePrice: Double
+        - currentPrice: Double
+        - purchaseDate: LocalDate
+        - createdAt: LocalDateTime
+        - updatedAt: LocalDateTime
+        --
+        + getCurrentValue(): Double
+        + getProfitLoss(): Double
+    }
+    
+    ' === DTOs ===
+    class InvestmentRequestDTO <<DTO>> {
+        - type: AssetType
+        - symbol: String
+        - name: String
+        - quantity: Double
+        - purchasePrice: Double
+        - purchaseDate: LocalDate
+        --
+        + getters/setters
+    }
+    
+    class InvestmentResponseDTO <<DTO>> {
+        - id: Long
+        - type: AssetType
+        - symbol: String
+        - name: String
+        - quantity: Double
+        - purchasePrice: Double
+        - currentPrice: Double
+        - purchaseDate: LocalDate
+        - currentValue: Double
+        - profitLoss: Double
+        - createdAt: LocalDateTime
+        - updatedAt: LocalDateTime
+        --
+        + getters/setters
+    }
+    
+    class SummaryDTO <<DTO>> {
+        - totalInvested: Double
+        - totalByType: Map<AssetType, Double>
+        - assetCount: Integer
+        - currentTotalValue: Double
+        - totalProfitLoss: Double
+        --
+        + getters/setters
+    }
+    
+    ' === CONTROLLERS ===
+    class InvestmentController <<Controller>> {
+        + createInvestment(InvestmentRequestDTO): ResponseEntity<InvestmentResponseDTO>
+        + getAllInvestments(): ResponseEntity<List<InvestmentResponseDTO>>
+        + getInvestmentsByType(AssetType): ResponseEntity<List<InvestmentResponseDTO>>
+        + getInvestment(Long): ResponseEntity<InvestmentResponseDTO>
+        + updateInvestment(Long, InvestmentRequestDTO): ResponseEntity<InvestmentResponseDTO>
+        + deleteInvestment(Long): ResponseEntity<Void>
+        + getSummary(): ResponseEntity<SummaryDTO>
+        + updateMarketValue(Long, Double): ResponseEntity<InvestmentResponseDTO>
+    }
+    
+    ' === INTERFACES DE SERVIÇO ===
+    interface InvestmentService <<Interface>> {
+        + createInvestment(InvestmentRequestDTO): InvestmentResponseDTO
+        + getAllInvestments(): List<InvestmentResponseDTO>
+        + getInvestmentsByType(AssetType): List<InvestmentResponseDTO>
+        + getInvestmentById(Long): InvestmentResponseDTO
+        + updateInvestment(Long, InvestmentRequestDTO): InvestmentResponseDTO
+        + deleteInvestment(Long): void
+        + getSummary(): SummaryDTO
+        + updateMarketValue(Long, Double): InvestmentResponseDTO
+    }
+    
+    interface MarketDataService <<Interface>> {
+        + getCurrentPrice(String, AssetType): Double
+    }
+    
+    ' === IMPLEMENTAÇÕES ===
+    class InvestmentServiceImpl <<Service>> {
+        - investmentRepository: InvestmentRepository
+        - marketDataService: MarketDataService
+        - modelMapper: ModelMapper
+        --
+        + createInvestment(InvestmentRequestDTO): InvestmentResponseDTO
+        + getAllInvestments(): List<InvestmentResponseDTO>
+        + getInvestmentsByType(AssetType): List<InvestmentResponseDTO>
+        + getInvestmentById(Long): InvestmentResponseDTO
+        + updateInvestment(Long, InvestmentRequestDTO): InvestmentResponseDTO
+        + deleteInvestment(Long): void
+        + getSummary(): SummaryDTO
+        + updateMarketValue(Long, Double): InvestmentResponseDTO
+        - calculateCurrentValue(Investment): Double
+        - calculateProfitLoss(Investment): Double
+        - mapToDTO(Investment): InvestmentResponseDTO
+        - mapToEntity(InvestmentRequestDTO): Investment
+    }
+    
+    class SimulationMarketDataServiceImpl <<Service>> {
+        + getCurrentPrice(String, AssetType): Double
+        - generateSimulatedPrice(Double, AssetType): Double
+    }
+    
+    ' === REPOSITORIES ===
+    interface InvestmentRepository <<Interface>> {
+        + findByType(AssetType): List<Investment>
+        + findBySymbolContainingIgnoreCase(String): List<Investment>
+        + findTop10ByOrderByPurchaseDateDesc(): List<Investment>
+    }
+    
+    ' === EXCEÇÕES ===
+    class InvestmentNotFoundException <<Exception>> {
+        - investmentId: Long
+        --
+        + InvestmentNotFoundException(Long)
+        + getMessage(): String
+    }
+    
+    ' === CONFIGURAÇÕES ===
+    class ModelMapperConfig <<Configuration>> {
+        + modelMapper(): ModelMapper
+        - configureModelMapper(ModelMapper): void
+    }
+    
+    ' === RELACIONAMENTOS ===
+    Investment "1" --> "1" AssetType : type
+    
+    InvestmentController --> InvestmentService : depends on
+    InvestmentService <|.. InvestmentServiceImpl : implements
+    InvestmentServiceImpl --> InvestmentRepository : uses
+    InvestmentServiceImpl --> MarketDataService : uses
+    MarketDataService <|.. SimulationMarketDataServiceImpl : implements
+    
+    InvestmentController ..> InvestmentRequestDTO : consumes
+    InvestmentController ..> InvestmentResponseDTO : produces
+    InvestmentController ..> SummaryDTO : produces
+    
+    InvestmentServiceImpl ..> InvestmentRequestDTO : parameter
+    InvestmentServiceImpl ..> InvestmentResponseDTO : returns
+    InvestmentServiceImpl ..> Investment : entity
+    
+    ModelMapperConfig ..> Investment : maps
+    ModelMapperConfig ..> InvestmentRequestDTO : maps from
+    ModelMapperConfig ..> InvestmentResponseDTO : maps to
+    
+    InvestmentService ..> InvestmentNotFoundException : throws
+    InvestmentServiceImpl ..> InvestmentNotFoundException : throws
+}
+
+' Relacionamentos com JPA
+note top of InvestmentRepository
+    extends JpaRepository<Investment, Long>
+end note
+
+@enduml

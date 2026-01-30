@@ -1,0 +1,68 @@
+@startuml
+skinparam node {
+    BackgroundColor<<Spring>> #FFE6CC
+    BackgroundColor<<Database>> #E8F5E8
+    BackgroundColor<<Docker>> #E0F2F1
+    BorderColor #666666
+}
+
+node "Servidor de Aplicação" as Server {
+    [Spring Boot Application\n(Port 8080)] <<Spring>>
+    
+    component "Investment API" as API {
+        [REST Controllers]
+        [Business Services]
+        [Data Repositories]
+    }
+}
+
+node "Container Docker" as Docker {
+    database "PostgreSQL\n(Port 5432)" <<Database>> {
+        folder "Schema: fintech" {
+            [investment table]
+            [users table\n(futuro)]
+            [transactions table\n(futuro)]
+        }
+    }
+}
+
+node "Cliente" as Client {
+    [Frontend React.js\n(Opcional)] <<Web>>
+    [API Client\n(Postman/Insomnia)] <<Client>>
+    [Mobile App\n(futuro)] <<Mobile>>
+}
+
+cloud "Internet/Network" as Network
+
+' Conexões
+Client --> Network : HTTP/HTTPS
+Network --> Server : Requests
+Server --> Docker : JDBC Connection
+Docker --> Server : Query Results
+
+' Dependências internas
+API --> [JPA/Hibernate]
+[Spring Boot Application\n(Port 8080)] --> API
+
+' Anotações
+note right of Docker
+    Imagem: postgres:15-alpine
+    Volume: postgres-data
+    Environment:
+    - POSTGRES_DB=fintech
+    - POSTGRES_USER=app_user
+    - POSTGRES_PASSWORD=secret
+end note
+
+note right of Server
+    Imagem Docker opcional
+    Dependencies:
+    - Spring Boot 3.x
+    - Spring Data JPA
+    - Spring Web
+    - PostgreSQL Driver
+    - ModelMapper
+    - Lombok
+end note
+
+@enduml

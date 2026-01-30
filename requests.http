@@ -1,0 +1,79 @@
+### Health Check
+GET http://localhost:8080/api/actuator/health
+
+### Swagger UI
+GET http://localhost:8080/api/swagger-ui.html
+
+### 1. Cadastrar novo ativo
+POST http://localhost:8080/api/investments
+Content-Type: application/json
+
+{
+  "type": "STOCK",
+  "symbol": "BBAS3",
+  "name": "Banco do Brasil",
+  "quantity": 100,
+  "purchasePrice": 56.80,
+  "purchaseDate": "2024-07-31"
+}
+
+### 2. Listar todos os ativos
+GET http://localhost:8080/api/investments
+
+### 3. Filtrar por tipo
+GET http://localhost:8080/api/investments?type=CRYPTO
+
+### 4. Buscar por ID
+GET http://localhost:8080/api/investments/1
+
+### 5. Buscar por símbolo
+GET http://localhost:8080/api/investments/search?symbol=PETR
+
+### 6. Atualizar ativo
+PUT http://localhost:8080/api/investments/1
+Content-Type: application/json
+
+{
+  "type": "STOCK",
+  "symbol": "PETR4",
+  "name": "Petrobras PN Atualizado",
+  "quantity": 150,
+  "purchasePrice": 29.50,
+  "purchaseDate": "2024-01-15"
+}
+
+### 7. Atualizar preço de mercado
+PATCH http://localhost:8080/api/investments/1/market-price?currentPrice=32.75
+
+### 8. Obter resumo da carteira
+GET http://localhost:8080/api/investments/summary
+
+### 9. Remover ativo
+DELETE http://localhost:8080/api/investments/1
+
+### 10. Cadastrar múltiplos ativos
+POST http://localhost:8080/api/investments
+Content-Type: application/json
+
+{
+  "type": "CRYPTO",
+  "symbol": "ADA",
+  "name": "Cardano",
+  "quantity": 500,
+  "purchasePrice": 2.30,
+  "purchaseDate": "2024-08-15"
+}
+
+###
+
+POST http://localhost:8080/api/investments
+Content-Type: application/json
+
+{
+  "type": "FIXED_INCOME",
+  "symbol": "LCI",
+  "name": "LCI Banco Inter",
+  "quantity": 5,
+  "purchasePrice": 1000.00,
+  "purchaseDate": "2024-09-01"
+}

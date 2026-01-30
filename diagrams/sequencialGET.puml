@@ -1,0 +1,46 @@
+@startuml
+skinparam sequence {
+    ParticipantBackgroundColor #E0F2F1
+    ActorBackgroundColor #FFF3E0
+    LifeLineBackgroundColor #FFFFFF
+    ArrowColor #333333
+}
+
+actor Client as "Cliente\n(HTTP Client)"
+participant "InvestmentController" as Controller
+participant "InvestmentServiceImpl" as Service
+participant "InvestmentRepository" as Repository
+database "PostgreSQL" as DB
+
+Client -> Controller: GET /investments/summary
+activate Client
+activate Controller
+
+Controller -> Service: getSummary()
+activate Service
+
+Service -> Repository: findAll()
+activate Repository
+Repository -> DB: SELECT * FROM investment
+activate DB
+DB --> Repository: List<Investment>
+deactivate DB
+Repository --> Service: List<Investment>
+deactivate Repository
+
+Service -> Service: calculateTotalInvested()
+Service -> Service: calculateTotalByType()
+Service -> Service: calculateCurrentTotalValue()
+Service -> Service: calculateTotalProfitLoss()
+
+Service -> Service: build SummaryDTO
+
+Service --> Controller: SummaryDTO
+deactivate Service
+
+Controller -> Controller: ResponseEntity.ok()
+Controller --> Client: 200 OK\n+ SummaryDTO
+deactivate Controller
+deactivate Client
+
+@enduml

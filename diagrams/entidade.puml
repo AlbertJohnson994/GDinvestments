@@ -1,0 +1,54 @@
+@startuml
+skinparam class {
+    BackgroundColor #FFE6CC
+    BorderColor #666666
+}
+
+entity "investment" as Investment {
+    + id: BIGINT <<PK>>
+    --
+    # type: VARCHAR(20) <<NOT NULL>>
+    # symbol: VARCHAR(10) <<NOT NULL>>
+    # name: VARCHAR(100) <<NOT NULL>>
+    # quantity: DECIMAL(15,4) <<NOT NULL>>
+    # purchase_price: DECIMAL(15,2) <<NOT NULL>>
+    # current_price: DECIMAL(15,2)
+    # purchase_date: DATE <<NOT NULL>>
+    # created_at: TIMESTAMP <<NOT NULL>>
+    # updated_at: TIMESTAMP <<NOT NULL>>
+    --
+    + getCurrentValue(): DECIMAL(15,2)
+    + getProfitLoss(): DECIMAL(15,2)
+}
+
+enum AssetType <<Enum>> {
+    STOCK = 'ACAO'
+    CRYPTO = 'CRIPTO'
+    FUND = 'FUNDO'
+    FIXED_INCOME = 'RENDA_FIXA'
+    OTHER = 'OUTRO'
+}
+
+' Índices
+Investment : (type)
+Investment : (symbol)
+Investment : (purchase_date)
+
+' Relacionamentos
+Investment }|--|| AssetType : type → AssetType.value
+
+note top of Investment
+    Tabela: investment
+    Schema: fintech
+    Índices:
+    - idx_investment_type (type)
+    - idx_investment_symbol (symbol)
+    - idx_investment_date (purchase_date)
+    
+    Restrições:
+    - quantity > 0
+    - purchase_price > 0
+    - current_price >= 0
+end note
+
+@enduml

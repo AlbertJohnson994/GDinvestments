@@ -1,0 +1,52 @@
+@startuml
+skinparam component {
+    BackgroundColor<<API>> #FFF3E0
+    BackgroundColor<<Business>> #E0F2F1
+    BackgroundColor<<Persistence>> #E8F5E8
+    BackgroundColor<<Domain>> #FFE6CC
+    BackgroundColor<<External>> #F3E5F5
+    BorderColor #666666
+}
+
+package "Investment API System" {
+    
+    [Investment Controller] <<API>>
+    [Investment Service] <<Business>>
+    [Market Data Service] <<Business>>
+    [Investment Repository] <<Persistence>>
+    [Database\n(PostgreSQL/MySQL)] <<Persistence>>
+    
+    [Investment Entity] <<Domain>>
+    [DTO Layer] <<Domain>>
+    
+    [External API\n(Market Data)] <<External>>
+    
+    ' Conexões principais
+    [Investment Controller] --> [Investment Service] : uses
+    [Investment Service] --> [Investment Repository] : data access
+    [Investment Repository] --> [Database\n(PostgreSQL/MySQL)] : persists
+    [Investment Service] --> [Market Data Service] : price updates
+    
+    ' Dependências de domínio
+    [Investment Service] --> [Investment Entity] : manipulates
+    [Investment Controller] --> [DTO Layer] : input/output
+    [Investment Service] --> [DTO Layer] : converts
+    
+    ' Conexão externa (opcional)
+    [Market Data Service] --> [External API\n(Market Data)] : fetches prices
+    
+    ' Banco de dados em container
+    note right of [Database\n(PostgreSQL/MySQL)]
+        Docker Container
+        Port: 5432/3306
+    end note
+    
+    ' DTO Layer detalhado
+    package "DTO Layer" {
+        [InvestmentRequestDTO]
+        [InvestmentResponseDTO]
+        [SummaryDTO]
+    }
+}
+
+@enduml

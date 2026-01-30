@@ -1,0 +1,82 @@
+@startuml
+skinparam package {
+    BackgroundColor<<Root>> #FFFFFF
+    BackgroundColor<<Controller>> #FFF3E0
+    BackgroundColor<<Service>> #E0F2F1
+    BackgroundColor<<Repository>> #E8F5E8
+    BackgroundColor<<Model>> #FFE6CC
+    BackgroundColor<<Exception>> #FFEBEE
+    BackgroundColor<<Config>> #F3E5F5
+    BorderColor #666666
+}
+
+package "com.fintech.investments" <<Root>> {
+    
+    package "controller" <<Controller>> {
+        [InvestmentController.java]
+    }
+    
+    package "service" <<Service>> {
+        interface "InvestmentService.java"
+        class "InvestmentServiceImpl.java"
+        interface "MarketDataService.java"
+        class "SimulationMarketDataServiceImpl.java"
+    }
+    
+    package "repository" <<Repository>> {
+        interface "InvestmentRepository.java"
+    }
+    
+    package "model" <<Model>> {
+        
+        package "entity" {
+            class "Investment.java"
+        }
+        
+        package "dto" {
+            class "InvestmentRequestDTO.java"
+            class "InvestmentResponseDTO.java"
+            class "SummaryDTO.java"
+        }
+        
+        package "enum" {
+            enum "AssetType.java"
+        }
+    }
+    
+    package "exception" <<Exception>> {
+        class "InvestmentNotFoundException.java"
+        class "GlobalExceptionHandler.java"
+    }
+    
+    package "config" <<Config>> {
+        class "ModelMapperConfig.java"
+        class "SwaggerConfig.java"
+    }
+}
+
+' Dependências
+[InvestmentController.java] --> [InvestmentService.java]
+[InvestmentController.java] --> [InvestmentRequestDTO.java]
+[InvestmentController.java] --> [InvestmentResponseDTO.java]
+[InvestmentController.java] --> [SummaryDTO.java]
+
+[InvestmentServiceImpl.java] ..|> [InvestmentService.java]
+[InvestmentServiceImpl.java] --> [InvestmentRepository.java]
+[InvestmentServiceImpl.java] --> [Investment.java]
+[InvestmentServiceImpl.java] --> [InvestmentRequestDTO.java]
+[InvestmentServiceImpl.java] --> [InvestmentResponseDTO.java]
+[InvestmentServiceImpl.java] --> [SummaryDTO.java]
+[InvestmentServiceImpl.java] --> [MarketDataService.java]
+
+[SimulationMarketDataServiceImpl.java] ..|> [MarketDataService.java]
+
+[InvestmentRepository.java] --> [Investment.java]
+
+[GlobalExceptionHandler.java] --> [InvestmentNotFoundException.java]
+
+[ModelMapperConfig.java] --> [Investment.java]
+[ModelMapperConfig.java] --> [InvestmentRequestDTO.java]
+[ModelMapperConfig.java] --> [InvestmentResponseDTO.java]
+
+@enduml
