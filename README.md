@@ -150,14 +150,6 @@ GDInvestementos/
 
 ---
 
-## ☁️ Deployment
-
-### Vercel (Frontend)
-To deploy the frontend to Vercel, please refer to the detailed guide in [VERCEL_DEPLOY.md](./VERCEL_DEPLOY.md).
-You will need to configure the **Root Directory** to `frontend` and set up the `VITE_API_URL` environment variable.
-
----
-
 ## 📝 License
 
 This project is developed for educational and portfolio purposes.

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Investment, InvestmentRequest, Summary, AssetType } from '../types/investment';
 
 // Usar proxy do Vite em desenvolvimento, ou URL direta em produção
-const API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : 'http://localhost:8080/api');
+const API_BASE_URL = import.meta.env.DEV ? '/api' : 'http://localhost:8080/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
